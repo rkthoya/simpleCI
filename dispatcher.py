@@ -46,7 +46,7 @@ class DispatcherHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         # self.request is the TCP socket connected to the client
-        self.data = self.request.recv(self.BUF_SIZE).strip()
+        self.data = self.request.recv(self.BUF_SIZE).strip().decode()
         command_groups = self.command_re.match(self.data)
         if not command_groups:
             self.request.sendall("Invalid command")
@@ -62,7 +62,8 @@ class DispatcherHandler(socketserver.BaseRequestHandler):
             host, port = re.findall(r":(\w*)", address)
             runner = {"host": host, "port":port}
             self.server.runners.append(runner)
-            self.request.sendall("OK")
+            response_bytes = "OK".encode()
+            self.request.sendall(response_bytes)
         elif command == "dispatch":
             print("going to dispatch")
             commit_id = command_groups.group(2)[1:]
@@ -112,7 +113,7 @@ def serve():
     # Create a thread to check the runner pool
     def runner_checker(server):
         def manage_commit_lists(runner):
-            for commit, assigned_runner in server.dispatched_commits.iteritems():
+            for commit, assigned_runner in server.dispatched_commits.items():
                 if assigned_runner == runner:
                     del server.dispatched_commits[commit]
                     server.pending_commits.append(commit)
