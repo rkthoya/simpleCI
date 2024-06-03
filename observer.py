@@ -27,7 +27,7 @@ def poll():
             # with the latest commit in the current working directory
             subprocess.check_output(["./update_repo.sh", args.repo])
         except subprocess.CalledProcessError as e:
-            raise Exception("Could not update and check repository. Reason: %s" % e.output)
+            raise Exception (f"Could not update and check repository. Reason: {e.output}")
 
         if os.path.isfile(".commit_id"):
             # great, we have a change! let's execute the tests
@@ -38,7 +38,7 @@ def poll():
                                                int(dispatcher_port),
                                                "status")
             except socket.error as e:
-                raise Exception("Could not communicate with dispatcher server: %s" % e)
+                raise Exception(f"Could not communicate with dispatcher server: {e}")
             if response == "OK":
                 # Dispatcher is present, let's send it a test
                 commit = ""
@@ -46,15 +46,13 @@ def poll():
                     commit = f.readline()
                 response = helpers.communicate(dispatcher_host,
                                                int(dispatcher_port),
-                                               "dispatch:%s" % commit)
+                                               f"dispatch:{commit}")
                 if response != "OK":
-                    raise Exception("Could not dispatch the test: %s" %
-                    response)
+                    raise Exception(f"Could not dispatch the test: {response}")
                 print("dispatched!") 
             else:
                 # Something wrong happened to the dispatcher
-                raise Exception("Could not dispatch the test: %s" %
-                response)
+                raise Exception(f"Could not dispatch the test: {response}")
         time.sleep(5)
 
 
