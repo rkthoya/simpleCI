@@ -1,10 +1,13 @@
 # simpleCI
-A simple distributed continuous integration system, that runs against a local git repository.
+A simple local continuous integration (CI) system, that runs against a git repository.
 
 # How it works
-The CI system involves 3 main components: an observer a dispatcher and a test runner.
-The observer checks a repository for any changes (commits), and notifies the dispatcher upon a change.
-The dispatcher then dispatches a test runner against the specific commit.
+This project strips down a CI system to its core basic components, which in this case are:
+- a repository **observer** that watches a repo for any changes.
+- a **dispatcher** that recieves notifications about changes in the repo from the observer, then assigns the commits to a test runner.
+- a **test runner** which runs tests against a given commit/change to the codebase.
+
+The components each run as a separate independent process and communicate through sockets in order to mimic a distributed/networked system. It also runs locally 
 
 # How to run the CI
 ## Setup
@@ -13,10 +16,8 @@ To work, the CI requires a repo to check against. Create a folder and start a lo
 `mkdir demo_repo`
 `git init`
 
-demo_repo serves as a main repository from which the CI pulls, check for commits and runs tests.
-The observer.py module does the checking for new changes. We need at least one commit in the main repo, and for this we can use the example tests in the our project repo.
-
-Copy the tests/ folder from the code base to demo_repo and then make a commit:
+demo_repo serves as a main repository from which the CI pulls, checks for commits and runs tests.
+update demo_repo by copying the tests/ folder from this codebase into it then commit the change:
 
 `git add tests/`
 `git commit -m "add tests"`
@@ -49,4 +50,4 @@ Trigger some tests by making a new commit in the main repo:
 `git add new_file`
 `git commit -m "new file" new_file`
 
-observer.py will rregister the new commit and notify the dispatcher. The output can be seen in the respective shells. Once the dispatcher receives the test results, it stores them in a test_results/ folder in the project's code base, using the commit id as the file name.
+observer.py will register the new commit and notify the dispatcher. The output can be seen in the respective shells. Once the dispatcher receives the test results, it stores them in a test_results/ folder in the project's code base, using the commit id as the file name.
